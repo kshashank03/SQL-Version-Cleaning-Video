@@ -13,6 +13,13 @@ I've posted by solution in `finalSQL.sql`. Feel free to post your solution.
 - Version1 is a major software update
 - Version2 is a minor software update
 
+**Desired Final Format**
+| deviceID | dateTime   | Version1 | Version2 |
+|----------|------------|----------|----------|
+| A        | 2021-01-01 | 1.0      | A1       |
+| A        | 2021-01-02 | 1.0      | A2       |
+| B        | 2022-01-01 | 3.0      | A4       |
+
 **Must use SQL to keep as much processing in one system as possible**
 
 - This would be easier in Python or R but then we’d have to extract the data from the database, transform it, then reimport it
