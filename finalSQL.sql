@@ -1,57 +1,44 @@
 WITH firstVersionTable as (
 SELECT
-  deviceID,
+  deviceid,
   firstTime,
   Version1,
   Version2,
-  COUNT(deviceID+version1) OVER (ORDER BY deviceID, firstTime) AS version1Grouping,
-  COUNT(deviceID+version2) OVER (ORDER BY deviceID, firstTime) AS version2Grouping 
+  COUNT(Version1) OVER (PARTITION BY deviceid ORDER BY firstTime) AS Version1Grouping,
+  COUNT(Version2) OVER (PARTITION BY deviceid ORDER BY firstTime) AS Version2Grouping 
 FROM (
-SELECT
+  SELECT
     *
   FROM (
-SELECT
-      deviceID,
-      metricName,
-      metricValue,
-      MIN(dateTime) AS firstTime
+    SELECT
+      deviceid,
+      metricname,
+      metricvalue,
+      MIN(datetime) AS firstTime
     FROM
-      DATA
+      data
     WHERE
-      metricName IN ('Version1',
+     metricName IN ('Version1',
         'Version2')
     GROUP BY
-      deviceID,
+      deviceid,
       metricName,
-      metricValue
- ) as firstTable
- PIVOT(MIN(metricValue) FOR metricName IN ([Version1],[Version2])) as secondTable
-) as finalTable)
---select * from firstVersionTable
-
-, v1JoinTable as (
-select 
-  deviceID, Version1, version1Grouping
-  from firstVersionTable
-  WHERE Version1 IS NOT NULL
-  GROUP BY deviceID, Version1, version1Grouping)
-, v2JoinTable as (
-select 
-  deviceID, Version2, version2Grouping
-  from firstVersionTable
-  WHERE Version2 IS NOT NULL
-  GROUP BY deviceid, Version2, version2Grouping
+      metricValue ) table_1 PIVOT (MIN(metricvalue) FOR metricname IN ([Version1], [Version2]) ) as pivoted_table ) a
 )
-  
- select 
-  a.deviceID,
-  a.firstTime,
-  COALESCE(a.Version1, b.Version1) as Version1,
-  COALESCE(a.Version2, c.Version2) as Version2
+select 
+  deviceid,
+  firstTime,
+  MAX(Version1) OVER (PARTITION BY deviceid, Version1Grouping
+    ) as forward_filled_version1,
+  MAX(Version2) OVER (PARTITION BY deviceid, Version2Grouping
+    ) as forward_filled_version2
 from 
-firstVersionTable a 
-LEFT JOIN v1JoinTable b
-ON a.version1Grouping = b.version1Grouping
-LEFT JOIN v2JoinTable c
-ON a.version2Grouping = c.version2Grouping
+firstVersionTable a
+ORDER BY deviceid, firstTime
+
+
+
+
+
+
 
