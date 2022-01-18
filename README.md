@@ -40,4 +40,4 @@ You can insert the data into https://sqliteonline.com/ for a quick and easy SQL 
 My solution uses:
 * The `PIVOT` operator
 * `WITH` to create a Continuous Table Expression (CTE)
-* `JOIN` to create the final table
+* `OVER` to use window functions
